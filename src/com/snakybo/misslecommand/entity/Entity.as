@@ -1,27 +1,50 @@
 package com.snakybo.misslecommand.entity {
-	import com.snakybo.misslecommand.world.World;
-	import flash.display.MovieClip;
 	import com.snakybo.misslecommand.Game;
-	import com.snakybo.misslecommand.util.Coord;
+	import com.snakybo.misslecommand.utils.display.sAddChild;
+	import com.snakybo.misslecommand.utils.display.sRemoveChild;
+	import com.snakybo.misslecommand.utils.math.Coord;
+	import com.snakybo.misslecommand.world.World;
+	import com.snakybo.misslecommand.sound.SoundManager;
+	import flash.display.MovieClip;
 	
 	/** @author Kevin Krol */
 	public class Entity extends MovieClip {
 		public static const ENTITY_ASTEROID:int = 1;
 		public static const ENTITY_MISSILE:int = 2;
-		public static const ENTITY_TOWER:int = 3
-		public static const ENTITY_ROCKET:int = 4
+		public static const ENTITY_ROCKET:int = 3;
 		
 		protected var mc:MovieClip;
 		protected var speed:Number;
 		
 		private var entityID:int;
 		
+		private var asteroids:Array = [new mc_asteroid_small(), new mc_asteroid_medium(), new mc_asteroid_large()];
+		
 		private var explodeX:int;
 		private var explodeY:int;
 		
-		public function Entity(entityID:int, mc:MovieClip, x:int, y:int, rotation:Number = NaN, speed:Number = NaN) {
+		public function Entity(entityID:int, x:int, y:int, rotation:Number = NaN, speed:Number = NaN) {
+			this.mc = new MovieClip();
+			
+			switch(entityID) {
+			case ENTITY_ASTEROID:
+				var rand:int = Math.floor(Math.random() * asteroids.length);
+				this.mc = asteroids[rand];
+				break;
+			case ENTITY_MISSILE:
+				this.mc = new mc_tower_gatling_missile();
+				break;
+			case ENTITY_ROCKET:
+				this.mc = new mc_tower_rocket_missile();
+				break;
+			case EntityTower.TOWER_MISSILE:
+				this.mc = new mc_tower_gatling();
+				break;
+			case EntityTower.TOWER_ROCKET:
+				this.mc = new mc_tower_rocket();
+			}
+			
 			this.entityID = entityID;
-			this.mc = mc;
 			this.speed = speed;
 			
 			mc.x = x;
@@ -33,7 +56,7 @@ package com.snakybo.misslecommand.entity {
 				explodeY = mouseY;
 			}
 			
-			Game.main.addChild(mc);
+			sAddChild(mc, Game.main, 2);
 		}
 		
 		/** Loop entities */
@@ -46,18 +69,16 @@ package com.snakybo.misslecommand.entity {
 					for each (var tower:EntityTower in World.towers) {
 						if (Coord.getDistance(mc.x, mc.y, tower.mc.x, tower.mc.y) < 65) {
 							tower.destroyed = true;
-							
 							explode();
 							
 							break;
 						}	
 					}
 				} else if (entityID == ENTITY_MISSILE) {
-					for each (var asteroid:EntityAsteroid in World.asteroids) {
+					for each (var asteroid:Entity in World.asteroids) {
 						if (Coord.getDistance(mc.x, mc.y, asteroid.mc.x, asteroid.mc.y) < 30) {
 							asteroid.explode();
 							explode();
-							
 							break;
 						}
 					}
@@ -65,33 +86,25 @@ package com.snakybo.misslecommand.entity {
 					if (Coord.getDistance(mc.x, mc.y, explodeX, explodeY) < 15) {
 						explode();
 						
-						for each(var asteroid2:EntityAsteroid in World.asteroids) {
+						for each(var asteroid2:Entity in World.asteroids) {
 							if (Coord.getDistance(mc.x, mc.y, asteroid2.mc.x, asteroid2.mc.y) < 50) {
 								asteroid2.explode();
 							}
 						}
 					}
 				}
-			} else {
-				destroy();
 			}
 		}
 		
 		/** Destroy object */
 		protected function destroy():void {
-			Game.main.removeChild(mc);
+			sRemoveChild(mc, Game.main);
 			
 			switch (entityID) {
-			case 1:
+			case ENTITY_ASTEROID:
 				World.asteroids.splice(World.asteroids.indexOf(this), 1);
 				break;
-			case 2:
-				World.missiles.splice(World.missiles.indexOf(this), 1);
-				break;
-			case 3:
-				World.towers.splice(World.towers.indexOf(this), 1);
-				break;
-			case 4:
+			case ENTITY_MISSILE || ENTITY_ROCKET:
 				World.missiles.splice(World.missiles.indexOf(this), 1);
 				break;
 			}
@@ -99,6 +112,8 @@ package com.snakybo.misslecommand.entity {
 		
 		/** Explode object */
 		protected function explode():void {
+			SoundManager.playSound("explosion");
+			
 			World.explosions.push(new Explosion(mc.x, mc.y, entityID));
 			
 			destroy();

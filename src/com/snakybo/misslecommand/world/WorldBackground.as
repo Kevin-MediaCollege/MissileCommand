@@ -1,6 +1,7 @@
 package com.snakybo.misslecommand.world {
-	import flash.display.MovieClip;
 	import com.snakybo.misslecommand.Game;
+	import com.snakybo.misslecommand.utils.display.sAddChild;
+	import flash.display.MovieClip;
 	
 	/** @author Kevin Krol */
 	public class WorldBackground extends MovieClip {
@@ -11,7 +12,7 @@ package com.snakybo.misslecommand.world {
 			
 			background.y = 0;
 			
-			Game.main.addChild(background);
+			sAddChild(background, Game.main);
 		}
 	}
 }

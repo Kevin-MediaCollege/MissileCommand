@@ -1,8 +1,11 @@
 package com.snakybo.misslecommand {
-	import com.snakybo.misslecommand.entity.EntityAsteroid;
 	import com.snakybo.misslecommand.world.World;
 	import flash.display.MovieClip;
+	import com.snakybo.misslecommand.sound.SoundManager;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
+	import com.snakybo.misslecommand.utils.toggleFullscreen;
 
 	/** @author Kevin Krol */
 	public class Game extends MovieClip {
@@ -17,7 +20,12 @@ package com.snakybo.misslecommand {
 			
 			asteroidSpawnDelay = 45;
 			
+			SoundManager.initialize();
+			SoundManager.importSound("explosion", "explosion.mp3");
+			
 			world = new World();
+			
+			main.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 		}
 		
 		/** Game loop */
@@ -35,6 +43,13 @@ package com.snakybo.misslecommand {
 			}
 			
 			world.loop();
+		}
+		
+		private function onKeyDown(e:KeyboardEvent):void { 
+			switch(e.keyCode) {
+			case Keyboard.F:
+				toggleFullscreen(main.stage);
+			}
 		}
 	}
 }

@@ -1,4 +1,5 @@
-package com.snakybo.misslecommand.util {
+package com.snakybo.misslecommand.utils.math {
+	
 	public class Coord {
 		/** @return Next X */
 		public static function getNextX(x:Number, direction:Number, speed:Number):Number {

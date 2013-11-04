@@ -1,14 +1,16 @@
 package com.snakybo.misslecommand.entity {
-	import flash.display.MovieClip;
 	import com.snakybo.misslecommand.Game;
-	import com.snakybo.misslecommand.util.Coord;
+	import com.snakybo.misslecommand.utils.display.sAddChild;
+	import com.snakybo.misslecommand.utils.display.sRemoveChild;
+	import com.snakybo.misslecommand.utils.math.Coord;
 	import com.snakybo.misslecommand.world.World;
+	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
 	
 	/** @author Kevin Krol */
 	public class EntityTower extends Entity {
-		public static const TOWER_GATLING:int = 1;
-		public static const TOWER_ROCKET:int = 2;
+		public static const TOWER_MISSILE:int = 10;	
+		public static const TOWER_ROCKET:int = 11;
 		
 		public var destroyed:Boolean;
 		
@@ -18,18 +20,28 @@ package com.snakybo.misslecommand.entity {
 		
 		private var buttonDown:Boolean;
 		
-		public function EntityTower(towerID:int, mc:MovieClip, mc_gun:MovieClip, x:int, y:int, cooldown:int) {
-			super(ENTITY_TOWER, mc, x, y);
+		public function EntityTower(towerID:int, x:int, y:int, cooldown:int) {
+			super(towerID, x, y);
+			
+			this.mc_gun = new MovieClip();
+			
+			switch(towerID) {
+				case TOWER_MISSILE:
+					this.mc_gun = new mc_tower_gatling_gun();
+					break;
+				case TOWER_ROCKET:
+					this.mc_gun = new mc_tower_rocket_gun();
+					break;
+			}
 			
 			this.towerID = towerID;
-			this.mc_gun = mc_gun;
 			this.cooldown = cooldown;
 			
 			mc_gun.x = x;
 			mc_gun.y = y - (mc_gun.height / 2) + 5;
 			mc_gun.rotation = -mc_gun.rotation;
 			
-			Game.main.addChildAt(mc_gun, 1);
+			sAddChild(mc_gun, Game.main, 1);
 			
 			Game.main.stage.addEventListener(MouseEvent.MOUSE_DOWN, onDown);
 			Game.main.stage.addEventListener(MouseEvent.MOUSE_UP, onUp);
@@ -39,14 +51,16 @@ package com.snakybo.misslecommand.entity {
 		private var tick:int;
 		public override function loop():void {
 			tick++;
-						
+			
 			if (destroyed) {
 				Game.main.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onDown);
 				Game.main.stage.removeEventListener(MouseEvent.MOUSE_UP, onUp);
 				
+				World.towers.splice(World.towers.indexOf(this), 1);
+				
 				explode();
 				
-				Game.main.removeChild(mc_gun);
+				sRemoveChild(mc_gun, Game.main);
 			}
 			
 			mc_gun.rotation = Coord.getDegreeFromPoint(mc_gun.x, mc_gun.y, mouseX, mouseY) - 270;
@@ -54,11 +68,11 @@ package com.snakybo.misslecommand.entity {
 			if (buttonDown) {
 				if (tick >= cooldown) {
 					switch(towerID) {
-					case TOWER_GATLING:
-						World.missiles.push(new EntityMissile(mc_gun.x, mc_gun.y, mc_gun.rotation, 6));
+					case TOWER_MISSILE:
+						World.missiles.push(new Entity(ENTITY_MISSILE, mc_gun.x, mc_gun.y, mc_gun.rotation, 6));
 						break;
 					case TOWER_ROCKET:
-						World.missiles.push(new EntityRocket(mc_gun.x, mc_gun.y, mc_gun.rotation, 15));
+						World.missiles.push(new Entity(ENTITY_ROCKET, mc_gun.x, mc_gun.y, mc_gun.rotation, 15));
 						break;
 					}
 					

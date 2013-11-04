@@ -1,8 +1,9 @@
 package com.snakybo.misslecommand.entity {
-	import flash.display.MovieClip;
 	import com.snakybo.misslecommand.Game;
+	import com.snakybo.misslecommand.utils.display.sAddChild;
+	import com.snakybo.misslecommand.utils.display.sRemoveChild;
 	import com.snakybo.misslecommand.world.World;
-	import flash.events.Event;
+	import flash.display.MovieClip;
 	
 	/** @author Kevin Krol */
 	public class Explosion extends MovieClip {
@@ -32,7 +33,7 @@ package com.snakybo.misslecommand.entity {
 			mc.alpha = 0;
 			up = true;
 			
-			Game.main.addChild(mc);
+			sAddChild(mc, Game.main);
 		}
 		
 		/** Loop explosion */
@@ -47,7 +48,7 @@ package com.snakybo.misslecommand.entity {
 				mc.alpha -= 0.05;
 				
 				if (mc.alpha <= 0) {
-					Game.main.removeChild(mc);
+					sRemoveChild(mc, Game.main);
 					World.explosions.splice(World.explosions.indexOf(this), 1);
 				}
 			}

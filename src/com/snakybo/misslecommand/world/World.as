@@ -1,12 +1,8 @@
 package com.snakybo.misslecommand.world {
-	import com.snakybo.misslecommand.entity.EntityAsteroid;
-	import com.snakybo.misslecommand.entity.Explosion;
-	import flash.display.MovieClip;
 	import com.snakybo.misslecommand.entity.Entity;
 	import com.snakybo.misslecommand.entity.EntityTower;
-	import com.snakybo.misslecommand.entity.EntityTowerGatling;
-	import com.snakybo.misslecommand.entity.EntityTowerRocket;
-	import com.snakybo.misslecommand.Game;
+	import com.snakybo.misslecommand.entity.Explosion;
+	import flash.display.MovieClip;
 	
 	/** @author Kevin Krol */
 	public class World extends MovieClip {
@@ -23,13 +19,13 @@ package com.snakybo.misslecommand.world {
 			
 			new WorldBackground();
 			
-			addTower(EntityTowerGatling, 112);
-			addTower(EntityTowerRocket, 287);
-			addTower(EntityTowerGatling, 462);
+			towers.push(new EntityTower(EntityTower.TOWER_MISSILE, 112, 696, 5));
+			towers.push(new EntityTower(EntityTower.TOWER_ROCKET, 287, 696, 15));
+			towers.push(new EntityTower(EntityTower.TOWER_MISSILE, 462, 696, 5));
 			
-			addTower(EntityTowerGatling, 812);
-			addTower(EntityTowerRocket, 987);
-			addTower(EntityTowerGatling, 1162);
+			towers.push(new EntityTower(EntityTower.TOWER_MISSILE, 812, 696, 5));
+			towers.push(new EntityTower(EntityTower.TOWER_ROCKET, 987, 696, 15));
+			towers.push(new EntityTower(EntityTower.TOWER_MISSILE, 1162, 696, 5));
 		}
 		
 		/** World loop */
@@ -68,12 +64,7 @@ package com.snakybo.misslecommand.world {
 			var x:int = Math.floor(Math.random() * 1280);
 			var speed:Number = (Math.random() * 10) + 1;
 			
-			asteroids.push(new EntityAsteroid(x, -15, getRotation(), speed));
-		}
-		
-		/** Add tower */
-		public function addTower(tower:Class, x:int):void {
-			towers.push(new tower(x, 696));
+			asteroids.push(new Entity(Entity.ENTITY_ASTEROID, x, -15, getRotation(), speed));
 		}
 	}
 }
