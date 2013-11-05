@@ -11,13 +11,15 @@ package com.snakybo.misslecommand.world {
 		public static var missiles:Vector.<Entity>;
 		public static var explosions:Vector.<Explosion>;
 		
+		private var worldHandler:WorldHandler;
+		
 		public function World() {
 			towers = new Vector.<EntityTower>;
 			asteroids = new Vector.<Entity>;
 			missiles = new Vector.<Entity>;
 			explosions = new Vector.<Explosion>;
 			
-			new WorldBackground();
+			worldHandler = new WorldHandler();
 			
 			towers.push(new EntityTower(EntityTower.TOWER_MISSILE, 112, 696, 5));
 			towers.push(new EntityTower(EntityTower.TOWER_ROCKET, 287, 696, 15));
@@ -45,6 +47,8 @@ package com.snakybo.misslecommand.world {
 			for each (var explosion:Explosion in explosions) {
 				explosion.loop();
 			}
+			
+			worldHandler.update();
 		}
 		
 		/** Add asteroid */

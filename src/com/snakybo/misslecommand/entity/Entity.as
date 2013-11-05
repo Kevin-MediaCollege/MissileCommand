@@ -13,6 +13,8 @@ package com.snakybo.misslecommand.entity {
 		public static const ENTITY_MISSILE:int = 2;
 		public static const ENTITY_ROCKET:int = 3;
 		
+		public static var asteroidsDestroyed:int = 0;
+		
 		protected var mc:MovieClip;
 		protected var speed:Number;
 		
@@ -22,6 +24,7 @@ package com.snakybo.misslecommand.entity {
 		
 		private var explodeX:int;
 		private var explodeY:int;
+		private var isExploding:Boolean;
 		
 		public function Entity(entityID:int, x:int, y:int, rotation:Number = NaN, speed:Number = NaN) {
 			this.mc = new MovieClip();
@@ -78,30 +81,38 @@ package com.snakybo.misslecommand.entity {
 					for each (var asteroid:Entity in World.asteroids) {
 						if (Coord.getDistance(mc.x, mc.y, asteroid.mc.x, asteroid.mc.y) < 30) {
 							asteroid.explode();
-							explode();
+							destroy();
+							
 							break;
 						}
 					}
 				} else if (entityID == ENTITY_ROCKET) {
 					if (Coord.getDistance(mc.x, mc.y, explodeX, explodeY) < 15) {
-						explode();
-						
-						for each(var asteroid2:Entity in World.asteroids) {
-							if (Coord.getDistance(mc.x, mc.y, asteroid2.mc.x, asteroid2.mc.y) < 50) {
-								asteroid2.explode();
+						if (!isExploding) {
+							isExploding = true;
+							
+							explode();
+							
+							for each(var asteroid2:Entity in World.asteroids) {
+								if (Coord.getDistance(mc.x, mc.y, asteroid2.mc.x, asteroid2.mc.y) < 50) {
+									asteroid2.explode();
+								}
 							}
 						}
 					}
 				}
+			} else {
+				destroy(true);
 			}
 		}
 		
 		/** Destroy object */
-		protected function destroy():void {
+		protected function destroy(outOfScreen:Boolean = false):void {
 			sRemoveChild(mc, Game.main);
 			
 			switch (entityID) {
 			case ENTITY_ASTEROID:
+				if(!outOfScreen) asteroidsDestroyed++;
 				World.asteroids.splice(World.asteroids.indexOf(this), 1);
 				break;
 			case ENTITY_MISSILE || ENTITY_ROCKET:
@@ -111,12 +122,12 @@ package com.snakybo.misslecommand.entity {
 		}
 		
 		/** Explode object */
-		protected function explode():void {
+		protected function explode(outOfScreen:Boolean = false):void {
 			SoundManager.playSound("explosion");
 			
 			World.explosions.push(new Explosion(mc.x, mc.y, entityID));
 			
-			destroy();
+			destroy(outOfScreen);
 		}
 		
 		/** Set X */

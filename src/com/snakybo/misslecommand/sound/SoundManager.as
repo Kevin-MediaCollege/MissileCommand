@@ -22,14 +22,14 @@ package com.snakybo.misslecommand.sound {
 		}
 		
 		public static function importSound(label:String, fileName:String):void {
-			var s:Sound = new Sound();
+			var sound:Sound = new Sound();
 			
-			s.addEventListener(Event.COMPLETE, onComplete);
+			sound.addEventListener(Event.COMPLETE, onComplete);
 			
-			s.load(new URLRequest("sound/" + fileName));
+			sound.load(new URLRequest("sound/" + fileName));
 			
 			function onComplete(e:Event):void {
-				sounds[label] = s;
+				sounds[label] = sound;
 			}
 		}
 		

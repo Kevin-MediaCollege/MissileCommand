@@ -6,7 +6,10 @@ package com.snakybo.misslecommand {
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	import com.snakybo.misslecommand.utils.toggleFullscreen;
-
+	import com.snakybo.misslecommand.utils.FPS;
+	import com.snakybo.misslecommand.utils.cookie.Cookie;
+	import com.snakybo.misslecommand.entity.Entity;
+	
 	/** @author Kevin Krol */
 	public class Game extends MovieClip {
 		public static var main:Main;
@@ -21,6 +24,8 @@ package com.snakybo.misslecommand {
 			asteroidSpawnDelay = 45;
 			
 			SoundManager.initialize();
+			Cookie.initialize();
+			
 			SoundManager.importSound("explosion", "explosion.mp3");
 			
 			world = new World();
@@ -33,9 +38,12 @@ package com.snakybo.misslecommand {
 		public function loop(e:Event):void {
 			tick++;
 			
-			// Spawn new asteroids
-			if ((tick % asteroidSpawnDelay) == 0 && World.towers.length > 0) {
-				world.addAsteroid();
+			if(World.towers.length > 0) {
+				if ((tick % asteroidSpawnDelay) == 0) {
+					world.addAsteroid();
+				}
+			} else {
+				Cookie.setCookie("missileCommand", "highscore", Entity.asteroidsDestroyed.toString());
 			}
 			
 			if ((tick % 200) == 0) {
